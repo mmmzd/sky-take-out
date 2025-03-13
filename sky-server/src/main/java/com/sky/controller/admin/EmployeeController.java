@@ -1,19 +1,22 @@
 package com.sky.controller.admin;
 
 import com.sky.constant.JwtClaimsConstant;
+import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.properties.JwtProperties;
+import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.EmployeeService;
 import com.sky.utils.JwtUtil;
 import com.sky.vo.EmployeeLoginVO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -71,4 +74,42 @@ public class EmployeeController {
         return Result.success();
     }
 
+    @PostMapping
+    @ApiOperation("员工注册")
+    public Result save(@RequestBody EmployeeDTO employeeDTO) {
+        log.info("employee register: {}", employeeDTO);
+        employeeService.save(employeeDTO);
+        return Result.success();
+    }
+
+    @GetMapping("/page")
+    public Result<PageResult> page(EmployeePageQueryDTO employeePageQueryDTO){
+        log.info("page quety paras: {}", employeePageQueryDTO);
+        PageResult pageResults = employeeService.pageQuery(employeePageQueryDTO);
+        return Result.success(pageResults);
+    }
+
+    @PostMapping("/status/{status}")
+    @ApiOperation("启用、禁用员工")
+    public Result startOrStop(@PathVariable Integer status, Long id) {
+
+        employeeService.startOrStop(status, id);
+        return Result.success();
+    }
+
+    @GetMapping("/{id}")
+    @ApiOperation("根据ID查询员工信息")
+    public Result<Employee> queryById(@PathVariable Long id) {
+
+        Employee employee = employeeService.queryById(id);
+        return Result.success(employee);
+    }
+
+    @PutMapping
+    @ApiOperation("修改员工信息")
+    public Result editEmployee(@RequestBody EmployeeDTO employeeDTO) {
+
+        employeeService.editEmployee(employeeDTO);
+        return Result.success();
+    }
 }
